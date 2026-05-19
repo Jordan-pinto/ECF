@@ -26,7 +26,19 @@ session_start();
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item"><a class="nav-link active" href="index.php">Accueil</a></li>
                     <li class="nav-item"><a class="nav-link" href="#">Covoiturages</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Connexion</a></li>
+                    
+                    <?php if (isset($_SESSION['utilisateur_id'])): ?>
+                        <li class="nav-item">
+                            <span class="nav-link text-warning fw-bold">
+                                👋 Bonjour <?= htmlspecialchars($_SESSION['pseudo']) ?> (<?= $_SESSION['credits'] ?> crédits)
+                            </span>
+                        </li>
+                        <li class="nav-item"><a class="nav-link" href="deconnexion.php">Déconnexion</a></li>
+                    <?php else: ?>
+                        <li class="nav-item"><a class="nav-link" href="connexion.php">Connexion</a></li>
+                        <li class="nav-item"><a class="nav-link" href="inscription.php">Inscription</a></li>
+                    <?php endif; ?>
+                    
                     <li class="nav-item"><a class="nav-link" href="#">Contact</a></li>
                 </ul>
             </div>
