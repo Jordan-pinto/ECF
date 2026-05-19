@@ -29,9 +29,9 @@ session_start();
                     
                     <?php if (isset($_SESSION['utilisateur_id'])): ?>
                         <li class="nav-item">
-                            <span class="nav-link text-warning fw-bold">
-                                👋 Bonjour <?= htmlspecialchars($_SESSION['pseudo']) ?> (<?= $_SESSION['credits'] ?> crédits)
-                            </span>
+                            <a href="profil.php" class="nav-link text-warning fw-bold">
+                                👋 Mon Espace (<?= $_SESSION['credits'] ?> crédits)
+                            </a>
                         </li>
                         <li class="nav-item"><a class="nav-link" href="deconnexion.php">Déconnexion</a></li>
                     <?php else: ?>
