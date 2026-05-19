@@ -32,6 +32,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajouter_voiture'])) {
     }
 }
 
+// --- TRAITEMENT : ANNULATION D'UNE RÉSERVATION ---
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['annuler_reservation'])) {
+    $id_cov_annul = $_POST['id_covoiturage'];
+    
+    // On va chercher le prix du trajet pour savoir combien te rembourser
+    $stmt_prix = $pdo->prepare("SELECT prix_personne FROM covoiturage WHERE covoiturage_id = :id_cov");
+    $stmt_prix->execute([':id_cov' => $id_cov_annul]);
+    $trajet_annul = $stmt_prix->fetch();
+    
+    if ($trajet_annul) {
+        $prix = $trajet_annul['prix_personne'];
+        
+        // TRANSACTION : C'est parti !
+        $pdo->beginTransaction();
+        try {
+            // A. On efface ton billet (dans la table participe)
+            $pdo->prepare("DELETE FROM participe WHERE utilisateur_id = :id_user AND covoiturage_id = :id_cov")
+                ->execute([':id_user' => $id_user, ':id_cov' => $id_cov_annul]);
+                
+            // B. On remet 1 place disponible dans la voiture
+            $pdo->prepare("UPDATE covoiturage SET nb_place = nb_place + 1 WHERE covoiturage_id = :id_cov")
+                ->execute([':id_cov' => $id_cov_annul]);
+                
+            // C. On te rend ton argent (les crédits)
+            $pdo->prepare("UPDATE utilisateur SET credits = credits + :prix WHERE utilisateur_id = :id_user")
+                ->execute([':prix' => $prix, ':id_user' => $id_user]);
+                
+            $pdo->commit(); // On valide tout !
+            
+            $_SESSION['credits'] += $prix; // On met à jour ta session pour l'affichage en haut
+            $message_voiture = '<div class="alert alert-success">Réservation annulée. Tes crédits t\'ont été remboursés ! 💸</div>';
+            
+        } catch (Exception $e) {
+            $pdo->rollBack(); // En cas de pépin, on annule tout
+            $message_voiture = '<div class="alert alert-danger">Erreur lors de l\'annulation.</div>';
+        }
+    }
+}
+
+
 // --- 2. RÉCUPÉRATION DES DONNÉES POUR L'AFFICHAGE ---
 
 // Infos de l'utilisateur
@@ -113,7 +153,12 @@ $mes_voitures = $stmt_mes_voitures->fetchAll();
                                 <p class="mb-0"><strong>🚗</strong> <?= htmlspecialchars($trajet['marque']) ?> <?= htmlspecialchars($trajet['modele']) ?> avec <?= htmlspecialchars($trajet['nom_chauffeur']) ?></p>
                             </div>
                             <div class="card-footer bg-white border-0 text-end pt-0">
-                                <button class="btn btn-outline-danger btn-sm">Annuler ma place</button>
+                                <form action="profil.php" method="POST" class="d-inline">
+                                    <input type="hidden" name="id_covoiturage" value="<?= $trajet['covoiturage_id'] ?>">
+                                    <button type="submit" name="annuler_reservation" class="btn btn-outline-danger btn-sm" onclick="return confirm('Sûr de vouloir annuler et récupérer tes crédits ?');">
+                                        Annuler ma place
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     <?php endforeach; ?>
