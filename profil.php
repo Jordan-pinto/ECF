@@ -80,7 +80,7 @@ $stmt->execute([':id' => $id_user]);
 $user = $stmt->fetch();
 
 // Historique des trajets (Passager)
-$sql_historique = "SELECT c.*, u_chauffeur.pseudo as nom_chauffeur, v.modele, m.libelle as marque
+$sql_historique = "SELECT c.*, u_chauffeur.pseudo as nom_chauffeur, u_chauffeur.utilisateur_id as chauffeur_id, v.modele, m.libelle as marque
                    FROM participe p
                    JOIN covoiturage c ON p.covoiturage_id = c.covoiturage_id
                    JOIN voiture v ON c.voiture_id = v.voiture_id
@@ -158,6 +158,9 @@ $mes_voitures = $stmt_mes_voitures->fetchAll();
                                     <button type="submit" name="annuler_reservation" class="btn btn-outline-danger btn-sm" onclick="return confirm('Sûr de vouloir annuler et récupérer tes crédits ?');">
                                         Annuler ma place
                                     </button>
+                                <a href="laisser_avis.php?chauffeur_id=<?= $trajet['chauffeur_id'] ?>" class="btn btn-outline-primary btn-sm ms-2">
+                                ⭐ Évaluer le chauffeur
+                                </a>
                                 </form>
                             </div>
                         </div>
