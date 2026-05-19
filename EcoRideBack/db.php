@@ -15,9 +15,6 @@ try {
     // Mode de récupération par défaut : on récupère les données sous forme de tableau associatif
     $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 
-    // Une petite phrase secrète pour vérifier en local que tout fonctionne
-    echo "Super, la connexion à EcoRide fonctionne !"; 
-
 } catch (PDOException $e) {
     // Si la connexion échoue, on arrête tout et on affiche l'erreur
     die("Erreur de connexion à la base de données : " . $e->getMessage());

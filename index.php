@@ -59,7 +59,7 @@ session_start();
 
         <div class="card shadow-sm border-0 bg-light p-4">
             <h3 class="mb-4 text-center">Trouvez votre prochain itinéraire</h3>
-            <form action="#" method="GET" class="row g-3 justify-content-center">
+            <form action="covoiturages.php" method="GET" class="row g-3 justify-content-center">
                 <div class="col-md-4">
                     <input type="text" class="form-control form-control-lg" name="depart" placeholder="Ville de départ" required>
                 </div>
